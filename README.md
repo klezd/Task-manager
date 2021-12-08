@@ -1,7 +1,21 @@
-# Getting Started with Create React App
+# Task Manager
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and using Mobal API for working with tasks
 
+For local run
+```
+npm install
+npm start
+```
+
+Functionality:
+
+- Add new tasks
+- Check on tasks for completion
+- Edit tasks
+- Delete tasks
+
+----------
 ## Available Scripts
 
 In the project directory, you can run:
