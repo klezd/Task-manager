@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import PropTypes from "prop-types";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -7,12 +7,14 @@ import Dialog from "@mui/material/Dialog";
 import Button from "@mui/material/Button";
 
 function ConfirmDialog(props) {
-  const { onAgree, onClose, open, text, title } = props;
+  const { onClose, open, data, btnCloseText } = props;
 
-  const onBtnClick = () => {
-    onAgree();
+  const agree = () => {
+    data && data.agreeAction();
     onClose();
   };
+
+  const close = () => onClose();
 
   return (
     <Fragment>
@@ -21,12 +23,13 @@ function ConfirmDialog(props) {
         maxWidth="xs"
         open={open}
       >
-        <DialogTitle>{title}</DialogTitle>
-        <DialogContent>{text}</DialogContent>
+        <DialogTitle>{data && data.title}</DialogTitle>
+        <DialogContent>{data && data.text}</DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={onBtnClick}>
-            Reload
+          <Button autoFocus onClick={agree}>
+            {data && data.agreeText}
           </Button>
+          {btnCloseText && <Button onClick={close}>{btnCloseText}</Button>}
         </DialogActions>
       </Dialog>
     </Fragment>
@@ -36,13 +39,9 @@ function ConfirmDialog(props) {
 export default ConfirmDialog;
 
 ConfirmDialog.propTypes = {
-  onAgree: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  text: PropTypes.node,
-  title: PropTypes.string,
+  btnCloseText: PropTypes.string,
+  data: PropTypes.object,
 };
 
-ConfirmDialog.defaultProps = {
-  title: "Confirmation",
-};

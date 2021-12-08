@@ -7,18 +7,24 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import styles from "./styles.module.css";
+import FormDialog from "./FormDialog";
+import ConfirmDialog from "./ConfimDialog";
 
-function Item(props, ref) {
-  const { data, updateItem } = props;
+function Item(props) {
+  const { data, updateItem, addItem, deleteItem } = props;
 
   const [checkState, setComponentCheck] = useState(data.state);
   const [name, setName] = useState(data.name);
-  const [description, setDescription] = useState(data.description);
+
+  const [editForm, setEdit] = useState(false);
+  const [addForm, setAdd] = useState(false);
+  const [deleteBox, setDelete] = useState(false);
+
+  useEffect(() => {}, [data]);
 
   const handleCheck = (e) => {
     const newState = parseInt(checkState) === 1 ? -1 : 1;
     setComponentCheck(newState);
-    console.log("handle check");
     updateItem(
       data.id,
       {
@@ -30,54 +36,42 @@ function Item(props, ref) {
   };
 
   const handleChangeName = (e) => {
-    console.log("handle name");
-
     setName(e.target.value);
   };
-  const handlePress = (e) => {
-    console.log("handle press");
 
+  const handlePress = (e) => {
     // if press Enter => handleChangeForm
     if (e.keyCode === 13) {
-      handleChangeForm("name");
+      updateItem(
+        data.id,
+        {
+          ...data,
+          name,
+        },
+        "name"
+      );
     }
   };
 
-  const handleChangeForm = (indicate = "name") => {
-    console.log("handle form");
-
-    updateItem(
-      data.id,
-      {
-        ...data,
-        name,
-        description,
-      },
-      indicate
-    );
-  };
-
   const onDelete = () => {
-    // Get Item
-    // Find tree
-    // on parent node: remove self as children, add children 's id to parent node children
-    // on children node: set parent into parent node id
-    // if parent is null, edit parent of children node into null
+    deleteItem(data);
   };
 
-  const onAdd = () => {};
+  const onAdd = (formData) => {
+    const newData = Object.assign(formData, {
+      parent: data.id,
+      version: 1,
+      due_date: null,
+    });
+    addItem(newData);
+  };
 
-  const onEdit = () => {};
+  const onEdit = (formData, changeState) => {
+    const indicate = changeState ? "all" : "name";
+    updateItem(data.id, Object.assign(data, formData), indicate);
+  };
 
-  useEffect(() => {
-    // let selfCheck = parseInt(checkState);
-    // Check children 's state
-    // loop all children
-    // children parseInt(state) === selfCheck => continue
-    // children parseInt(state) !== selfCheck => selfCheck = 0 => break
-    // set state for self
-    // setComponentCheck(selfCheck)
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <Fragment>
@@ -96,18 +90,44 @@ function Item(props, ref) {
           className={styles.input}
         />
         <div className={styles.actionBtn}>
-          <Button onClick={onAdd}>
+          <Button onClick={() => setAdd(true)}>
             <AddIcon />
           </Button>
-          <Button onClick={onEdit}>
+          <Button onClick={() => setEdit(true)}>
             <EditIcon sx={{ color: "green" }} />
           </Button>
-          <Button onClick={onDelete}>
+          <Button onClick={() => setDelete(true)}>
             <DeleteIcon sx={{ color: "red" }} />
           </Button>
         </div>
       </ListItem>
       {/* Dialog form */}
+      <FormDialog
+        onSubmit={(d, s) => onEdit(d, s)}
+        open={editForm}
+        onClose={() => setEdit(false)}
+        title="Edit Task"
+        data={data}
+        type="edit"
+      />
+      <FormDialog
+        onSubmit={(d) => onAdd(d)}
+        open={addForm}
+        onClose={() => setAdd(false)}
+        title="Add New Task"
+        type="add"
+      />
+      <ConfirmDialog
+        onClose={() => setDelete(false)}
+        open={deleteBox}
+        btnCloseText="Close"
+        data={{
+          text: `Are you sure to delete task ${data.name}`,
+          title: "Confirm?",
+          agreeText: "Delete",
+          agreeAction: () => onDelete(),
+        }}
+      />
     </Fragment>
   );
 }
@@ -118,4 +138,6 @@ export default Item;
 Item.propTypes = {
   data: PropTypes.object.isRequired,
   updateItem: PropTypes.func,
+  addItem: PropTypes.func.isRequired,
+  deleteItem: PropTypes.func.isRequired,
 };

@@ -13,30 +13,34 @@ export const prepareRequests = (dataArr) => {
   dataArr.map((d) => {
     const { data, method, origin } = d;
     // Check version if request can be called
-    if (method.match(/put|patch/g)) {
-      if (data.version === origin.version) {
+    if (!origin && method !== "post") return null;
+
+    if (method === "post") {
+      const request = api({
+        url: `/tasks/`,
+        method,
+        data,
+      });
+      return requestArr.push(request);
+    }
+
+    if (data.version === origin.version) {
+      if (method.match(/put|patch/g)) {
         const request = api({
           url: `/tasks/${data.id}/`,
           method,
           data,
         });
         return requestArr.push(request);
-      }
-    } else if (method === "delete") {
-      if (data.version === origin.version) {
+      } else if (method === "delete") {
         const request = api({
           url: `/tasks/${data.id}/`,
           method,
         });
         return requestArr.push(request);
       }
-    } else if (method === "post") {
-      const request = api({
-        url: `/tasks/`,
-        method,
-        data,
-      });
     }
+
     return null;
   });
   return requestArr;
