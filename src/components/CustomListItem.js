@@ -1,33 +1,50 @@
-import { Fragment } from "react";
+import { Fragment, useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import List from "@mui/material/List";
-
-import Item from "./ListItem";
-import { Box } from "@mui/system";
+import Box from "@mui/system/Box";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Item from "./Item";
 
 function CustomListItem(props) {
-  const { data, setChecked } = props;
+  const { data, updateItem } = props;
+
+  useEffect(() => {}, [data]);
 
   if (data) {
     return (
-      <Box sx={{ marginLeft: 2 }}>
-        <List>
-          {data.map((d) => (
-            <Fragment key={`task_${d.id}`}>
-              {/* 
-            Parent 
-            Question: how many children
-            */}
-              <Item data={d} setChecked={setChecked}></Item>
-              {/* Children */}
+      <Box>
+        {data.map((d) => (
+          <Accordion key={`task_${d.id}`}>
+            <AccordionSummary
+              expandIcon={
+                data.children && data.children.length !== 0 ? (
+                  <ExpandMoreIcon />
+                ) : (
+                  <></>
+                )
+              }
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+              sx={{ padding: 1 }}
+            >
+              <Item data={d} updateItem={updateItem}></Item>
+            </AccordionSummary>
+
+            {/* Children */}
+            {/* {data.children && data.children.length !== 0 && ( */}
+            <AccordionDetails>
               <CustomListItem
                 data={d.children}
                 id={d.id}
-                setChecked={setChecked}
+                updateItem={updateItem}
               />
-            </Fragment>
-          ))}
-        </List>
+            </AccordionDetails>
+
+            {/* )} */}
+          </Accordion>
+        ))}
       </Box>
     );
   } else {
@@ -39,5 +56,5 @@ export default CustomListItem;
 
 CustomListItem.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object),
-  setChecked: PropTypes.func.isRequired,
+  updateItem: PropTypes.func.isRequired,
 };

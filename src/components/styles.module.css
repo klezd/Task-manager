@@ -1,0 +1,29 @@
+.input {
+  outline: none;
+  width: 100%;
+  border: 1px solid transparent;
+  padding: 8px;
+  transition: all 1s linear;
+  cursor:text;
+  font-size: 1em;
+}
+
+.input:hover, .input:focus {
+  border-color: initial;
+
+}
+
+.line {
+  display: grid !important;
+  width: 100%;
+  grid-template-columns: 10% 60% 30%;
+}
+
+.actionBtn {
+  justify-content: flex-end;
+  display: none;
+}
+
+.line:hover .actionBtn {
+  display: flex;
+}
