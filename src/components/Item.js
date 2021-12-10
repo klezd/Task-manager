@@ -26,7 +26,6 @@ function Item(props) {
     const newState = parseInt(checkState) === 1 ? -1 : 1;
     setComponentCheck(newState);
     updateItem(
-      data.id,
       {
         ...data,
         state: parseInt(newState),
@@ -43,7 +42,6 @@ function Item(props) {
     // if press Enter => handleChangeForm
     if (e.keyCode === 13) {
       updateItem(
-        data.id,
         {
           ...data,
           name,
@@ -68,7 +66,7 @@ function Item(props) {
 
   const onEdit = (formData, changeState) => {
     const indicate = changeState ? "all" : "name";
-    updateItem(data.id, Object.assign(data, formData), indicate);
+    updateItem(Object.assign(data, formData), indicate);
   };
 
   useEffect(() => {}, []);

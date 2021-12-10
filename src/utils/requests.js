@@ -10,7 +10,10 @@ export const api = axios.create({
 
 export const prepareRequests = (dataArr) => {
   const requestArr = [];
+  if (dataArr.length === 0) return;
   dataArr.map((d) => {
+    if (!d) return null;
+
     const { data, method, origin } = d;
     // Check version if request can be called
     if (!origin && method !== "post") return null;
@@ -24,22 +27,23 @@ export const prepareRequests = (dataArr) => {
       return requestArr.push(request);
     }
 
-    if (data.version === origin.version) {
-      if (method.match(/put|patch/g)) {
-        const request = api({
-          url: `/tasks/${data.id}/`,
-          method,
-          data,
-        });
-        return requestArr.push(request);
-      } else if (method === "delete") {
-        const request = api({
-          url: `/tasks/${data.id}/`,
-          method,
-        });
-        return requestArr.push(request);
-      }
+    // TODO Recheck with origin on App.js
+    // if (data.version === origin.version) {
+    if (method.match(/put|patch/g)) {
+      const request = api({
+        url: `/tasks/${data.id}/`,
+        method,
+        data,
+      });
+      return requestArr.push(request);
+    } else if (method === "delete") {
+      const request = api({
+        url: `/tasks/${data.id}/`,
+        method,
+      });
+      return requestArr.push(request);
     }
+    // }
 
     return null;
   });

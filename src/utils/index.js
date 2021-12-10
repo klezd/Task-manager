@@ -13,82 +13,33 @@ export const mapData = (data) => {
   return map;
 };
 
-export const toTreeData = (array) => {
-  let map = mapData(array);
-  let result = [];
-
-  let node = {};
-  let i = 0;
-
-  for (i = 0; i < array.length; i += 1) {
-    // Add children field to task
-    array[i].children = [];
-  }
-
-  for (i = 0; i < array.length; i += 1) {
-    // Get node item
-    node = array[i];
-    if (node.parent !== null) {
-      // If not root node, find parent and goes into children
-      array[map[node.parent]].children.push(node);
-    } else {
-      result.push(node);
-    }
-  }
-  return result;
-};
 
 // Find all parents
-export const extractTreeId = (node, id) => {
-  // If current node id matches the search id, return
-  // an array contain its which is the beginning of parent result
-  if (node.id === id) {
-    return [node.id];
+export const findAllPredecessor = (dataArr, node) => {
+  if (node.parent === null) {
+    return [node];
   }
+  const parent = dataArr.find((n) => n.id === node.parent);
 
-  let res = [node.id];
-  // Otherwise,recursively the process of nodes in this children array
-  if (Array.isArray(node.children)) {
-    for (let child of node.children) {
-      // Recursively process treeNode. If an array result is
-      // returned, then add the node.children to that result
-      // and return recursively
-      const childResult = extractTreeId(child, id);
-
-      if (Array.isArray(childResult)) {
-        return [...res].concat(childResult);
-      }
-    }
-  }
+  return [parent, ...findAllPredecessor(dataArr, parent)];
 };
 
-export const findAllDescendantNode = (node, id) => {
-  let res = [];
-  // If the node id is equal to given id, find all decendant belong to this node
-  if (node.id === id) {
-    res = [node];
-    if (Array.isArray(node.children)) {
-      for (let child of node.children) {
-        const childResult = findAllDescendantNode(child, child.id);
-        if (Array.isArray(childResult)) {
-          res = [...res].concat(childResult);
-        }
-      }
-    }
-  }
+export const removeDeDup = (dataArr) =>
+  dataArr.reduce((output, item) => {
+    return !output.find(o => o.id === item.id) ? [...output, item] : output;
+  }, []);
 
-  // If the node id is not the given id, loop to find the node
-  if (node.id !== id && node.children.length !== 0) {
-    // Loop through the children array and its children
-    if (Array.isArray(node.children)) {
-      for (let child of node.children) {
-        const childResult = findAllDescendantNode(child, id);
-        if (Array.isArray(childResult)) {
-          res = [...res].concat(childResult);
-        }
-      }
+export const findAllDescendant = (dataArr, node) => {
+  const children = dataArr.filter((task) => task.parent === node.id); // Array
+  let res = [...children];
+  // If this is the lowest level node
+  if (children.length === 0) {
+    return [];
+  } else {
+    for (let i = 0; i < children.length; i++) {
+      // find children of node children[i]
+      res = [...res, ...findAllDescendant(dataArr, children[i])];
     }
+    return res;
   }
-
-  return res;
 };

@@ -1,8 +1,8 @@
 import {
   findAllChildrenWithParent,
-  toTreeData,
-  extractTreeId,
-  findAllDescendantNode,
+  removeDeDup,
+  findAllPredecessor,
+  findAllDescendant,
 } from ".";
 
 const parent = [
@@ -17,110 +17,26 @@ const parent = [
   { id: 70, parent: 69 },
 ];
 
-const parentStructured = [
-  {
-    id: 56,
-    parent: null,
-    children: [
-      {
-        id: 61,
-        parent: 56,
-        children: [
-          { id: 62, parent: 61, children: [] },
-          { id: 63, parent: 61, children: [] },
-        ],
-      },
-    ],
-  },
-  {
-    id: 57,
-    parent: null,
-    children: [
-      {
-        id: 66,
-        parent: 57,
-        children: [
-          { id: 68, parent: 66, children: [] },
-          {
-            id: 69,
-            parent: 66,
-            children: [{ id: 70, parent: 69, children: [] }],
-          },
-        ],
-      },
-    ],
-  },
+const predecessor = [
+  { id: 69, parent: 66 },
+  { id: 66, parent: 57 },
+  { id: 57, parent: null },
+];
+const dupArr = [
+  { id: 69, parent: 66 },
+  { id: 66, parent: 57 },
+  { id: 57, parent: null },
+  { id: 57, parent: null },
 ];
 
-const nodeExtracted = {
-  id: 57,
-  parent: null,
-  children: [
-    {
-      id: 66,
-      parent: 57,
-      children: [
-        { id: 68, parent: 66, children: [] },
-        {
-          id: 69,
-          parent: 66,
-          children: [{ id: 70, parent: 69, children: [] }],
-        },
-      ],
-    },
-  ],
-};
-
-const node70 = [{ id: 70, parent: 69, children: [] }];
-const node69 = [
-  {
-    id: 69,
-    parent: 66,
-    children: [{ id: 70, parent: 69, children: [] }],
-  },
-  { id: 70, parent: 69, children: [] },
+const item70 = { id: 70, parent: 69, children: [] };
+const item57 = { id: 57, parent: null };
+const item57Child = [
+  { id: 66, parent: 57 },
+  { id: 68, parent: 66 },
+  { id: 69, parent: 66 },
+  { id: 70, parent: 69 },
 ];
-const nodeAsArray = [
-  {
-    id: 57,
-    parent: null,
-    children: [
-      {
-        id: 66,
-        parent: 57,
-        children: [
-          { id: 68, parent: 66, children: [] },
-          {
-            id: 69,
-            parent: 66,
-            children: [{ id: 70, parent: 69, children: [] }],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 66,
-    parent: 57,
-    children: [
-      { id: 68, parent: 66, children: [] },
-      {
-        id: 69,
-        parent: 66,
-        children: [{ id: 70, parent: 69, children: [] }],
-      },
-    ],
-  },
-  { id: 68, parent: 66, children: [] },
-  {
-    id: 69,
-    parent: 66,
-    children: [{ id: 70, parent: 69, children: [] }],
-  },
-  { id: 70, parent: 69, children: [] },
-];
-
-const treeArr = [57, 66, 69, 70];
 
 describe("Test utils", () => {
   test("findAllChildrenIdWithParent", () => {
@@ -135,22 +51,16 @@ describe("Test utils", () => {
       },
     ]);
   });
-
-  test("toTreeData", () => {
-    expect(toTreeData(parent)).toStrictEqual(parentStructured);
+  test("removeDeDup", () => {
+    expect(removeDeDup(dupArr)).toStrictEqual(predecessor);
   });
 
-  test("extractTree", () => {
-    expect(extractTreeId(nodeExtracted, 70)).toStrictEqual(treeArr);
+  test("findAllPredecessor", () => {
+    expect(removeDeDup(findAllPredecessor(parent, item70))).toStrictEqual(
+      predecessor
+    );
   });
-
-  test("findAllDescendantNode return only 1 element if it is the lowest", () => {
-    expect(findAllDescendantNode(nodeExtracted, 70)).toStrictEqual(node70);
-  });
-  test("findAllDescendantNode return only children element", () => {
-    expect(findAllDescendantNode(nodeExtracted, 69)).toStrictEqual(node69);
-  });
-  test("findAllDescendantNode return all descendant belong to given node", () => {
-    expect(findAllDescendantNode(nodeExtracted, 57)).toStrictEqual(nodeAsArray);
+  test("findAllDescendant", () => {
+    expect(findAllDescendant(parent, item57)).toStrictEqual(item57Child);
   });
 });

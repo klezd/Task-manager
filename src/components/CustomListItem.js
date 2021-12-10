@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import PropTypes from "prop-types";
 import Box from "@mui/system/Box";
 import Accordion from "@mui/material/Accordion";
@@ -6,22 +5,22 @@ import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Item from "./Item";
+import { findAllChildrenWithParent } from "../utils";
 
 function CustomListItem(props) {
-  const { data, updateItem, addItem, deleteItem } = props;
+  const { data, updateItem, addItem, deleteItem, id } = props;
 
-  useEffect(() => {
-    console.log();
-  }, [data]);
+  const dataDisplay = findAllChildrenWithParent(data, id);
 
   if (data) {
     return (
       <Box>
-        {data.map((d) => {
+        {dataDisplay.map((d) => {
+          const children = findAllChildrenWithParent(data, d.id);
           return (
             <Accordion key={`task_${d.id}`} sx={{ padding: 2, paddingLeft: 4 }}>
               <AccordionSummary
-                expandIcon={d.children.length > 0 ? <ExpandMoreIcon /> : <></>}
+                expandIcon={children.length !== 0 ? <ExpandMoreIcon /> : <></>}
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
@@ -34,10 +33,10 @@ function CustomListItem(props) {
               </AccordionSummary>
 
               {/* Children */}
-              {d.children && d.children.length !== 0 && (
+              {children.length !== 0 && (
                 <AccordionDetails>
                   <CustomListItem
-                    data={d.children}
+                    data={data}
                     id={d.id}
                     updateItem={updateItem}
                     addItem={addItem}
@@ -62,4 +61,5 @@ CustomListItem.propTypes = {
   updateItem: PropTypes.func.isRequired,
   addItem: PropTypes.func.isRequired,
   deleteItem: PropTypes.func.isRequired,
+  id: PropTypes.oneOfType([PropTypes.number, null]),
 };
